@@ -1,0 +1,7 @@
+giskard[llm]
+openai
+tiktoken
+urllib3==1.25.11 
+requests==2.32.3 
+requests-toolbelt==0.9.1
+groq
