@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 import torch
@@ -26,7 +26,7 @@ def get_device():
     return device
 
 class TransformerModelHandler:
-    def __init__(self, model_name="t5-small"):
+    def __init__(self, model_name="t5-small",api_key=None):
         """
         Initialize the model and tokenizer, and select the device.
         
@@ -37,8 +37,8 @@ class TransformerModelHandler:
         self.device = get_device()
         
         # Load the tokenizer and model from HuggingFace
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(self.device)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name,token=api_key)
+        self.model = AutoModelForCausalLM.from_pretrained(model_name,token=api_key).to(self.device)
         print(f"Model {model_name} loaded and moved to {self.device}")
 
     def encode(self, input_text):
@@ -67,7 +67,9 @@ class TransformerModelHandler:
         """
         # Generate output from the model without computing gradients
         with torch.no_grad():
-            outputs = self.model.generate(**inputs)
+            outputs = self.model.generate(**inputs,max_new_tokens=100, pad_token_id=0, 
+                            eos_token_id=128009 # TO BE REMOVED 
+                            )
         return outputs
 
     def run(self, input_text):
